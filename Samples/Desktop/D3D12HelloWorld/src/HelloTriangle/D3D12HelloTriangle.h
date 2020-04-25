@@ -34,6 +34,8 @@ public:
 
 private:
     static const UINT FrameCount = 2;
+    static const UINT CommandAllocatorsCount = 6;
+    static const UINT CommandListsCount = 6;
 
     struct Vertex
     {
@@ -47,12 +49,12 @@ private:
     ComPtr<IDXGISwapChain3> m_swapChain;
     ComPtr<ID3D12Device> m_device;
     ComPtr<ID3D12Resource> m_renderTargets[FrameCount];
-    ComPtr<ID3D12CommandAllocator> m_commandAllocator;
+    ComPtr<ID3D12CommandAllocator> m_commandAllocators[CommandAllocatorsCount];
     ComPtr<ID3D12CommandQueue> m_commandQueue;
     ComPtr<ID3D12RootSignature> m_rootSignature;
     ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
     ComPtr<ID3D12PipelineState> m_pipelineState;
-    ComPtr<ID3D12GraphicsCommandList> m_commandList;
+    ComPtr<ID3D12GraphicsCommandList> m_commandLists[CommandListsCount];
     UINT m_rtvDescriptorSize;
 
     // App resources.
@@ -60,8 +62,8 @@ private:
     D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
 
     // Synchronization objects.
-    UINT m_frameIndex;
-    HANDLE m_fenceEvent;
+    UINT64 m_cmdListFenceValues[CommandListsCount];
+    HANDLE m_cmdListFenceEvents[CommandListsCount];
     ComPtr<ID3D12Fence> m_fence;
     UINT64 m_fenceValue;
 
@@ -69,4 +71,6 @@ private:
     void LoadAssets();
     void PopulateCommandList();
     void WaitForPreviousFrame();
+    void Execute(UINT commandListIdx);
+    void Wait();
 };
